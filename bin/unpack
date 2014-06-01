@@ -1,0 +1,24 @@
+if [ -f recovery.img ]; then
+    echo
+    echo "[*] recovery.img found, renaming to boot.img for ease of script use."
+    echo
+    mv recovery.img boot.img
+fi
+
+echo
+echo "[*] Unloki'ing boot.img if loki'd."
+echo
+loki_tool unlok boot.img boot.unlok
+echo "[+] Renaming boot.unlok to boot.img for ease of script use."
+mv boot.unlok boot.img
+
+echo
+exec > >(tee kernel-info.txt) 2>&1
+split_bootimg_dtb.pl boot.img
+#sed 's/[[:print:]]//g' kernel-info.txt
+
+extract-ramdisk.pl boot.img
+
+echo
+echo " [*] kernel info saved to kernel-info.txt."
+echo
